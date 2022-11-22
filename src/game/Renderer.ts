@@ -1,13 +1,29 @@
 import clamp from '../clamp';
 import Board from './Board';
 
-const BORDER_COLOR = 'black';
-
 class Renderer {
+  private borderColor = 'black';
   public constructor(
     private board: Board,
     private ctx: CanvasRenderingContext2D
-  ) {}
+  ) {
+    this.onUpdateColorPreference = this.onUpdateColorPreference.bind(this);
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    if (mediaQuery.matches) {
+      this.borderColor = 'white';
+    }
+
+    mediaQuery.onchange = this.onUpdateColorPreference;
+  }
+
+  private onUpdateColorPreference(event: MediaQueryListEvent) {
+    if (event.matches) {
+      this.borderColor = 'white';
+    } else {
+      this.borderColor = 'black';
+    }
+  }
 
   private draw() {
     const width = this.ctx.canvas.width;
@@ -52,7 +68,7 @@ class Renderer {
       this.ctx.beginPath();
       this.ctx.moveTo(offset, row * tileSize);
       this.ctx.lineTo(width - offset, row * tileSize);
-      this.ctx.strokeStyle = BORDER_COLOR;
+      this.ctx.strokeStyle = this.borderColor;
       this.ctx.lineWidth = 0.5;
       this.ctx.stroke();
     }
@@ -61,9 +77,23 @@ class Renderer {
       this.ctx.beginPath();
       this.ctx.moveTo(offset + col * tileSize, 0);
       this.ctx.lineTo(offset + col * tileSize, height);
-      this.ctx.strokeStyle = BORDER_COLOR;
+      this.ctx.strokeStyle = this.borderColor;
       this.ctx.lineWidth = 0.5;
       this.ctx.stroke();
+    }
+
+    for (const [row, time] of Object.entries(this.board.removed)) {
+      this.ctx.beginPath();
+      this.ctx.fillStyle = 'white';
+      this.ctx.globalAlpha =
+        time < 0.5 ? 2 * time ** 2 : -1 + (4 - 2 * time) * time;
+      this.ctx.fillRect(
+        offset,
+        row * tileSize,
+        tileSize * this.board.columns,
+        tileSize
+      );
+      this.ctx.globalAlpha = 1;
     }
 
     this.ctx.beginPath();
@@ -72,7 +102,7 @@ class Renderer {
     this.ctx.lineTo(width - offset, height - border);
     this.ctx.lineTo(offset, height - border);
     this.ctx.lineTo(offset, border);
-    this.ctx.strokeStyle = BORDER_COLOR;
+    this.ctx.strokeStyle = this.borderColor;
     this.ctx.lineWidth = border * 2;
     this.ctx.stroke();
   }

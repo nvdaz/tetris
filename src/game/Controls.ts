@@ -20,7 +20,6 @@ class Controls {
     }
     if (key === 'KeyD') {
       this.board.translate(1);
-      console.log('tr');
       this.cooldown[key] = 0.1;
     }
     if (key === 'KeyS') {
@@ -46,7 +45,6 @@ class Controls {
   }
 
   private onKeyUp(key: KeyCode) {
-    console.log('up', key);
     if (key in this.cooldown) {
       delete this.cooldown[key];
     }

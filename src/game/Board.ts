@@ -26,6 +26,7 @@ class Board {
   grid: Tile[][];
   piece!: Piece;
   next: number = 1;
+  removed: Record<number, number> = {};
 
   public constructor(readonly columns: number, readonly rows: number) {
     this.grid = [...Array(rows)].map((_) =>
@@ -35,7 +36,12 @@ class Board {
   }
 
   private newPiece() {
-    this.piece = structuredClone(pieces[Math.floor(Math.random() * 6)]);
+    const piece = structuredClone(pieces[Math.floor(Math.random() * 7)]);
+
+    for (const part of piece.parts) {
+      part[0] += Math.floor((this.columns - piece.width) / 2);
+    }
+    this.piece = piece;
   }
 
   public translate(dir: -1 | 1) {
@@ -96,11 +102,9 @@ class Board {
 
       for (let i = 0; i < this.rows; i++) {
         if (this.grid[i].every((t) => t !== null)) {
-          console.log(this.grid.length);
           this.grid.splice(i, 1);
-          console.log(this.grid.length);
           this.grid.unshift([...Array(this.columns)].map((_) => null));
-          console.log(this.grid.length);
+          this.removed[i] = 0.5;
         }
       }
 
@@ -120,10 +124,16 @@ class Board {
   }
 
   public tick(delta: number) {
+    for (const key of Object.keys(this.removed)) {
+      this.removed[key] -= delta;
+      if (this.removed[key] <= 0) {
+        delete this.removed[key];
+      }
+    }
     this.next -= delta;
     if (this.next <= 0) {
       this.descend();
-      this.next = 0.5;
+      this.next = 1;
     }
   }
 }
