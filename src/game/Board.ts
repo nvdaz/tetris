@@ -55,9 +55,11 @@ class Board {
 
   public rotate() {
     if (!isRotatable(this.piece)) return;
+
+    const newParts: [number, number][] = [];
     const center = this.piece.center[this.piece.rotation];
     let point = [this.piece.parts[0][0], this.piece.parts[0][1]];
-    console.log(this.piece.rotation, center);
+
     for (const part of this.piece.parts) {
       if (part[0] < point[0]) {
         point[0] = part[0];
@@ -68,14 +70,18 @@ class Board {
     }
 
     for (const part of this.piece.parts) {
-      let k = part[0];
       const direction = this.piece.rotation % 2 ? 1 : -1;
-      part[0] = -(part[1] - point[1] - center[1] * direction) + point[0];
-      part[1] = k - point[0] - center[0] * direction + point[1];
+      newParts.push([
+        -(part[1] - point[1] - center[1] * direction) + point[0],
+        part[0] - point[0] - center[0] * direction + point[1],
+      ]);
     }
 
+    if (!newParts.every((p) => this.grid[p[1]][p[0]] === null)) return;
+
+    this.piece.parts = newParts;
+
     this.piece.rotation = (this.piece.rotation + 1) % this.piece.center.length;
-    console.log(this.piece.rotation);
   }
 
   public descend() {
@@ -88,18 +94,35 @@ class Board {
         this.grid[part[1]][part[0]] = this.piece.color;
       }
 
+      for (let i = 0; i < this.rows; i++) {
+        if (this.grid[i].every((t) => t !== null)) {
+          console.log(this.grid.length);
+          this.grid.splice(i, 1);
+          console.log(this.grid.length);
+          this.grid.unshift([...Array(this.columns)].map((_) => null));
+          console.log(this.grid.length);
+        }
+      }
+
       this.newPiece();
     } else {
       for (const part of this.piece.parts) {
         part[1] += 1;
       }
     }
+
+    return shouldStick;
+  }
+
+  public drop() {
+    let shouldStick;
+    while (!(shouldStick = this.descend())) {}
   }
 
   public tick(delta: number) {
     this.next -= delta;
     if (this.next <= 0) {
-      //this.descend();
+      this.descend();
       this.next = 0.5;
     }
   }
