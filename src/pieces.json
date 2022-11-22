@@ -1,6 +1,7 @@
 [
   {
     "color": "yellow",
+    "rotatable": false,
     "parts": [
       [0, 0],
       [1, 0],
@@ -10,56 +11,98 @@
   },
   {
     "color": "cyan",
+    "rotatable": true,
     "parts": [
       [0, 0],
       [1, 0],
       [2, 0],
       [3, 0]
-    ]
+    ],
+    "center": [
+      [-1, -1],
+      [-1, 2]
+    ],
+    "rotation": 0
   },
   {
     "color": "orange",
+    "rotatable": true,
     "parts": [
       [0, 0],
       [0, 1],
       [0, 2],
       [1, 2]
-    ]
+    ],
+    "center": [
+      [1, -1],
+      [1, 1],
+      [0, -2],
+      [0, 2]
+    ],
+    "rotation": 0
   },
   {
     "color": "blue",
+    "rotatable": true,
     "parts": [
       [1, 0],
       [1, 1],
       [1, 2],
       [0, 2]
-    ]
+    ],
+    "center": [
+      [0, -2],
+      [0, 2],
+      [1, -1],
+      [1, 1]
+    ],
+    "rotation": 0
   },
   {
     "color": "red",
+    "rotatable": true,
     "parts": [
       [0, 0],
       [1, 0],
       [1, 1],
       [2, 1]
-    ]
+    ],
+    "center": [
+      [0, -1],
+      [0, 2]
+    ],
+    "rotation": 0
   },
   {
     "color": "lightgreen",
+    "rotatable": true,
     "parts": [
       [0, 2],
       [1, 2],
       [1, 1],
       [2, 1]
-    ]
+    ],
+    "center": [
+      [0, -2],
+      [0, 1]
+    ],
+    "rotation": 0
   },
   {
     "color": "purple",
+    "rotatable": true,
     "parts": [
       [0, 1],
       [1, 1],
       [2, 1],
       [1, 0]
-    ]
+    ],
+    "center": [
+      [0, -2],
+      [-1, 1],
+      [-1, -1],
+      [0, 2]
+    ],
+    "rotation": 0
   }
 ]

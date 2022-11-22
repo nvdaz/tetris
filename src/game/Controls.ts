@@ -23,6 +23,10 @@ class Controls {
       this.board.descend();
       this.cooldown = COOLDOWN;
     }
+    if (this.keyboard.isKeyPressed('KeyR')) {
+      this.board.rotate();
+      this.cooldown = COOLDOWN*3;
+    }
   }
 }
 

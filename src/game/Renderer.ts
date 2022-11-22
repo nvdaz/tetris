@@ -13,9 +13,10 @@ class Renderer {
     const width = this.ctx.canvas.width;
     const height = this.ctx.canvas.height;
     const tileSize = Math.min(
-      width / this.board.rows,
-      height / this.board.columns
+      width / this.board.columns,
+      height / this.board.rows
     );
+
     const offset = (width - tileSize * 10) / 2;
     const border = clamp(1, tileSize * 0.04, 4);
 
