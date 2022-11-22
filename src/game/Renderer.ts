@@ -24,8 +24,9 @@ class Renderer {
 
     for (let col = 0; col < this.board.columns; col++) {
       for (let row = 0; row < this.board.rows; row++) {
-        if (this.board.grid[row][col]) {
-          this.ctx.fillStyle = this.board.grid[row][col];
+        const tile = this.board.grid[row][col];
+        if (tile) {
+          this.ctx.fillStyle = tile;
           this.ctx.fillRect(
             offset + col * tileSize,
             row * tileSize,

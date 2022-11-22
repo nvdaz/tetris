@@ -8,10 +8,7 @@ import {
   useState,
 } from 'react';
 import { assert } from './assert';
-import clamp from './clamp';
 import Game from './Game';
-import useActivePiece from './useActivePiece';
-import useGrid from './useGrid';
 
 type GameCanvasProps = {
   width: number;

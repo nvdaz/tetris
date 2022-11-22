@@ -3,18 +3,18 @@ import pieces from '../pieces.json';
 export type Tile = string | null;
 
 type RotatablePiece = {
-  color:string;
+  color: string;
   parts: [number, number][];
   rotatable: true;
   center: [number, number][];
   rotation: number;
-}
+};
 
 type StaticPiece = {
-  color:string;
-  parts:[number,number];
+  color: string;
+  parts: [number, number][];
   rotatable: false;
-}
+};
 
 export type Piece = StaticPiece | RotatablePiece;
 
@@ -24,7 +24,7 @@ function isRotatable(piece: Piece): piece is RotatablePiece {
 
 class Board {
   grid: Tile[][];
-  piece: Piece;
+  piece!: Piece;
   next: number = 1;
 
   public constructor(readonly columns: number, readonly rows: number) {
@@ -57,7 +57,7 @@ class Board {
     if (!isRotatable(this.piece)) return;
     const center = this.piece.center[this.piece.rotation];
     let point = [this.piece.parts[0][0], this.piece.parts[0][1]];
-    console.log(this.piece.rotation,center);
+    console.log(this.piece.rotation, center);
     for (const part of this.piece.parts) {
       if (part[0] < point[0]) {
         point[0] = part[0];
@@ -65,17 +65,16 @@ class Board {
       if (part[1] < point[1]) {
         point[1] = part[1];
       }
-
     }
 
     for (const part of this.piece.parts) {
       let k = part[0];
-      const direction = this.piece.rotation % 2 ? 1 : - 1;
+      const direction = this.piece.rotation % 2 ? 1 : -1;
       part[0] = -(part[1] - point[1] - center[1] * direction) + point[0];
       part[1] = k - point[0] - center[0] * direction + point[1];
     }
 
-    this.piece.rotation = (this.piece.rotation + 1) % this.piece.center.length
+    this.piece.rotation = (this.piece.rotation + 1) % this.piece.center.length;
     console.log(this.piece.rotation);
   }
 

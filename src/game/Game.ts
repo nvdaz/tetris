@@ -12,26 +12,13 @@ class Game {
   private previouslyElapsed = 0;
   private frameRequestId?: number;
 
-  public constructor(
-    ctx: CanvasRenderingContext2D,
-    width: number,
-    height: number
-  ) {
+  public constructor(ctx: CanvasRenderingContext2D) {
     this.keyboard = new Keyboard();
     this.board = new Board(10, 20);
     this.controls = new Controls(this.keyboard, this.board);
-    this.renderer = new Renderer(this.board, ctx, width, height);
+    this.renderer = new Renderer(this.board, ctx);
 
     this.tick = this.tick.bind(this);
-  }
-
-  public setWidth(width: number) {
-    console.log('w', width);
-    this.renderer.width = width;
-  }
-
-  public setHeight(height: number) {
-    this.renderer.height = height;
   }
 
   private tick(elapsed: number): void {
@@ -51,7 +38,7 @@ class Game {
   }
 
   public stop() {
-    window.cancelAnimationFrame(this.frameRequestId);
+    if (this.frameRequestId) window.cancelAnimationFrame(this.frameRequestId);
     this.keyboard.destroy();
   }
 }
