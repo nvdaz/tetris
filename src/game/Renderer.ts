@@ -82,7 +82,11 @@ class Renderer {
       this.ctx.stroke();
     }
 
-    for (const [row, time] of Object.entries(this.board.removed)) {
+    for (const [row, time] of Object.entries(this.board.removed) as unknown as [
+      number,
+      number
+    ][]) {
+      if (!Number.isInteger(row)) return;
       this.ctx.beginPath();
       this.ctx.fillStyle = 'white';
       this.ctx.globalAlpha =

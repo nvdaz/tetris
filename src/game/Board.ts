@@ -1,10 +1,12 @@
 import pieces from '../pieces.json';
+import { assert } from './assert';
 
 export type Tile = string | null;
 
 type RotatablePiece = {
   color: string;
   parts: [number, number][];
+  width: number;
   rotatable: true;
   center: [number, number][];
   rotation: number;
@@ -13,6 +15,7 @@ type RotatablePiece = {
 type StaticPiece = {
   color: string;
   parts: [number, number][];
+  width: number;
   rotatable: false;
 };
 
@@ -36,12 +39,13 @@ class Board {
   }
 
   private newPiece() {
-    const piece = structuredClone(pieces[Math.floor(Math.random() * 7)]);
+    this.piece = structuredClone(
+      pieces[Math.floor(Math.random() * 7)]
+    ) as unknown as Piece;
 
-    for (const part of piece.parts) {
-      part[0] += Math.floor((this.columns - piece.width) / 2);
+    for (const part of this.piece.parts) {
+      part[0] += Math.floor((this.columns - this.piece.width) / 2);
     }
-    this.piece = piece;
   }
 
   public translate(dir: -1 | 1) {
@@ -124,7 +128,7 @@ class Board {
   }
 
   public tick(delta: number) {
-    for (const key of Object.keys(this.removed)) {
+    for (const key of Object.keys(this.removed) as unknown as number[]) {
       this.removed[key] -= delta;
       if (this.removed[key] <= 0) {
         delete this.removed[key];
