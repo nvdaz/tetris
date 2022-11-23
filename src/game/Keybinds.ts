@@ -23,7 +23,7 @@ class Keybinds {
   }
 
   public getActions(): Action[] {
-    const actions = [];
+    const actions: Action[] = [];
 
     for (const key of this.keyboard.keysPressed) {
       const action = this.translateKey(key);
