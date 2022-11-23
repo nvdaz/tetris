@@ -17,8 +17,8 @@ class Game {
   public constructor(ctx: CanvasRenderingContext2D) {
     this.keyboard = new Keyboard();
     this.board = new Board(10, 20);
-    this.controls = new Controls(this.board);
-    this.keybinds = new Keybinds(this.keyboard, this.controls);
+    this.keybinds = new Keybinds(this.keyboard);
+    this.controls = new Controls(this.board, this.keybinds);
     this.renderer = new Renderer(this.board, ctx);
 
     this.tick = this.tick.bind(this);

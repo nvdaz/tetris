@@ -8,7 +8,8 @@ type RotatablePiece = {
   parts: [number, number][];
   width: number;
   rotatable: true;
-  center: [number, number][];
+  rotationsClockwise: [number, number][];
+  rotationsCounterClockwise: [number, number][];
   rotation: number;
 };
 
@@ -63,11 +64,48 @@ class Board {
     }
   }
 
-  public rotate() {
+  public rotateClockwise() {
     if (!isRotatable(this.piece)) return;
 
     const newParts: [number, number][] = [];
-    const center = this.piece.center[this.piece.rotation];
+    const center = this.piece.rotationsClockwise[this.piece.rotation];
+    let point = [this.piece.parts[0][0], this.piece.parts[0][1]];
+
+    for (const part of this.piece.parts) {
+      if (part[0] < point[0]) {
+        point[0] = part[0];
+      }
+      if (part[1] < point[1]) {
+        point[1] = part[1];
+      }
+    }
+
+    for (const part of this.piece.parts) {
+      const direction = this.piece.rotation % 2 ? 1 : -1;
+      newParts.push([
+        part[1] - point[1] - center[1] * direction + point[0],
+        -(part[0] - point[0] - center[0] * direction) + point[1],
+      ]);
+    }
+
+    if (
+      !newParts.every(
+        (p) => p[1] >= 0 && p[1] < this.rows && this.grid[p[1]][p[0]] === null
+      )
+    )
+      return;
+
+    this.piece.parts = newParts;
+
+    this.piece.rotation =
+      (this.piece.rotation + 1) % this.piece.rotationsClockwise.length;
+  }
+
+  public rotateCounterClockwise() {
+    if (!isRotatable(this.piece)) return;
+
+    const newParts: [number, number][] = [];
+    const center = this.piece.rotationsCounterClockwise[this.piece.rotation];
     let point = [this.piece.parts[0][0], this.piece.parts[0][1]];
 
     for (const part of this.piece.parts) {
@@ -96,7 +134,10 @@ class Board {
 
     this.piece.parts = newParts;
 
-    this.piece.rotation = (this.piece.rotation + 1) % this.piece.center.length;
+    this.piece.rotation =
+      this.piece.rotation === 0
+        ? this.piece.rotationsClockwise.length - 1
+        : this.piece.rotation - 1;
   }
 
   public descend() {
@@ -118,13 +159,13 @@ class Board {
       }
 
       this.newPiece();
-      this.next = 1;
     } else {
       for (const part of this.piece.parts) {
         part[1] += 1;
       }
     }
 
+    this.next = 1;
     return shouldStick;
   }
 

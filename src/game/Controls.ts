@@ -1,48 +1,62 @@
-import { KeyCode } from "keyboardevent-codes";
-import Board from "./Board";
-import Keyboard from "./Keyboard";
+import { KeyCode } from 'keyboardevent-codes';
+import Board from './Board';
+import Keybinds from './Keybinds';
+import Keyboard from './Keyboard';
 
 export type Action =
-  | "translateLeft"
-  | "translateRight"
-  | "descend"
-  | "rotateClockwise"
-  | "drop";
+  | 'translateLeft'
+  | 'translateRight'
+  | 'descend'
+  | 'rotateClockwise'
+  | 'rotateCounterClockwise'
+  | 'drop';
 
 const COOLDOWN = 0.1;
 
 class Controls {
-  private cooldown: Partial<Record<Action, number>> = {};
-  public constructor(private board: Board) {}
+  private cooldowns: Map<Action, number> = new Map();
+  public constructor(private board: Board, private keybinds: Keybinds) {}
 
   public handle(action: Action) {
-    const multiplier = action in this.cooldown ? 1 : 2;
-    if (action === "translateLeft") {
+    let cooldown = 0;
+    const multiplier = this.cooldowns.has(action) ? 1 : 2;
+    if (action === 'translateLeft') {
       this.board.translate(-1);
-      this.cooldown[action] = 0.1 * multiplier;
-    } else if (action === "translateRight") {
+      cooldown = 0.1;
+    } else if (action === 'translateRight') {
       this.board.translate(1);
-      this.cooldown[action] = 0.1 * multiplier;
-    } else if (action === "descend") {
+      cooldown = 0.1;
+    } else if (action === 'descend') {
       this.board.descend();
-      this.cooldown[action] = 0.1 * multiplier;
-    } else if (action === "rotateClockwise") {
-      this.board.rotate();
-      this.cooldown[action] = 0.2 * multiplier;
-    } else if (action === "drop") {
+      cooldown = 0.1;
+    } else if (action === 'rotateClockwise') {
+      this.board.rotateClockwise();
+      cooldown = 0.2;
+    } else if (action === 'rotateCounterClockwise') {
+      this.board.rotateCounterClockwise();
+      cooldown = 0.2;
+    } else if (action === 'drop') {
       this.board.drop();
-      this.cooldown[action] = 0.5 * multiplier;
+      cooldown = 0.5;
     }
-  }
 
-  public endHandle(action: Action) {
-    delete this.cooldown[action];
+    this.cooldowns.set(action, cooldown * multiplier);
   }
 
   public tick(delta: number) {
-    for (const action of Object.keys(this.cooldown) as ReadonlyArray<Action>) {
-      this.cooldown[action]! -= delta;
-      if (this.cooldown[action]! <= 0) {
+    const actions = this.keybinds.getActions();
+    for (const [action, cooldown] of this.cooldowns) {
+      if (!actions.includes(action)) {
+        this.cooldowns.delete(action);
+      } else if (cooldown - delta <= 0) {
+        this.handle(action);
+      } else {
+        this.cooldowns.set(action, cooldown - delta);
+      }
+    }
+
+    for (const action of actions) {
+      if (!this.cooldowns.has(action)) {
         this.handle(action);
       }
     }

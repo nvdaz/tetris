@@ -20,9 +20,17 @@
       [3, 0]
     ],
     "width": 4,
-    "center": [
-      [-1, -1],
-      [-1, 2]
+    "rotationsClockwise": [
+      [-2, 1],
+      [2, 1],
+      [-1, 2],
+      [1, 2]
+    ],
+    "rotationsCounterClockwise": [
+      [-1, -2],
+      [-1, 2],
+      [-2, -1],
+      [-2, 1]
     ],
     "rotation": 0
   },
@@ -31,15 +39,21 @@
     "rotatable": true,
     "parts": [
       [0, 0],
-      [1, 0],
-      [2, 0],
-      [0, 1]
+      [0, 1],
+      [1, 1],
+      [2, 1]
     ],
     "width": 3,
-    "center": [
-      [-1, -1],
-      [0, 2],
+    "rotationsClockwise": [
+      [-2, 0],
+      [2, 0],
+      [-1, 1],
+      [1, 1]
+    ],
+    "rotationsCounterClockwise": [
       [0, -2],
+      [0, 2],
+      [-1, -1],
       [-1, 1]
     ],
     "rotation": 0
@@ -54,11 +68,17 @@
       [2, 1]
     ],
     "width": 3,
-    "center": [
+    "rotationsClockwise": [
+      [-1, 1],
+      [1, 1],
+      [-2, 0],
+      [2, 0]
+    ],
+    "rotationsCounterClockwise": [
       [-1, -1],
-      [0, 2],
+      [-1, 1],
       [0, -2],
-      [-1, 1]
+      [0, 2]
     ],
     "rotation": 0
   },
@@ -72,9 +92,17 @@
       [2, 1]
     ],
     "width": 3,
-    "center": [
-      [0, -1],
-      [0, 2]
+    "rotationsClockwise": [
+      [-2, 1],
+      [2, 1],
+      [-1, 0],
+      [1, 0]
+    ],
+    "rotationsCounterClockwise": [
+      [-2, 1],
+      [2, 1],
+      [1, 1],
+      [-1, -1]
     ],
     "rotation": 0
   },
@@ -88,9 +116,17 @@
       [2, 1]
     ],
     "width": 3,
-    "center": [
+    "rotationsClockwise": [
+      [-2, 0],
+      [2, 0],
+      [-1, 1],
+      [1, 1]
+    ],
+    "rotationsCounterClockwise": [
       [0, -2],
-      [0, 1]
+      [0, 2],
+      [-1, -1],
+      [-1, 1]
     ],
     "rotation": 0
   },
@@ -104,11 +140,17 @@
       [1, 0]
     ],
     "width": 3,
-    "center": [
-      [0, -2],
+    "rotationsClockwise": [
+      [-2, 0],
+      [2, 0],
       [-1, 1],
+      [1, 1]
+    ],
+    "rotationsCounterClockwise": [
+      [0, -2],
+      [0, 2],
       [-1, -1],
-      [0, 2]
+      [-1, 1]
     ],
     "rotation": 0
   }

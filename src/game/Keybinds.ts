@@ -3,12 +3,7 @@ import Controls, { Action } from './Controls';
 import Keyboard from './Keyboard';
 
 class Keybinds {
-  public constructor(private keyboard: Keyboard, private controls: Controls) {
-    this.onKeyDown = this.onKeyDown.bind(this);
-    this.onKeyUp = this.onKeyUp.bind(this);
-    this.keyboard.registerOnKeyDown(this.onKeyDown);
-    this.keyboard.registerOnKeyUp(this.onKeyUp);
-  }
+  public constructor(private keyboard: Keyboard) {}
 
   private translateKey(key: KeyCode): Action | undefined {
     if (key === 'KeyA' || key === 'ArrowLeft') {
@@ -17,35 +12,25 @@ class Keybinds {
       return 'translateRight';
     } else if (key === 'KeyS' || key === 'ArrowDown') {
       return 'descend';
-    } else if (key === 'KeyR' || key === 'ArrowUp') {
+    } else if (key === 'KeyX' || key === 'ArrowUp') {
       return 'rotateClockwise';
-    } else if (key === 'Space') {
+    } else if (key === 'KeyZ') {
+      return 'rotateCounterClockwise';
+    }
+    if (key === 'Space') {
       return 'drop';
     }
   }
 
-  private handle(key: KeyCode) {
-    const action = this.translateKey(key);
+  public getActions(): Action[] {
+    const actions = [];
 
-    if (action) {
-      this.controls.handle(action);
+    for (const key of this.keyboard.keysPressed) {
+      const action = this.translateKey(key);
+      if (action) actions.push(action);
     }
-  }
 
-  private endHandle(key: KeyCode) {
-    const action = this.translateKey(key);
-
-    if (action) {
-      this.controls.endHandle(action);
-    }
-  }
-
-  private onKeyDown(key: KeyCode) {
-    this.handle(key);
-  }
-
-  private onKeyUp(key: KeyCode) {
-    this.endHandle(key);
+    return actions;
   }
 }
 
