@@ -1,5 +1,6 @@
 import Board from './Board';
 import Controls from './Controls';
+import Keybinds from './Keybinds';
 import Keyboard from './Keyboard';
 import Renderer from './Renderer';
 
@@ -7,6 +8,7 @@ class Game {
   private keyboard: Keyboard;
   private board: Board;
   private controls: Controls;
+  private keybinds: Keybinds;
   private renderer: Renderer;
 
   private previouslyElapsed = 0;
@@ -15,7 +17,8 @@ class Game {
   public constructor(ctx: CanvasRenderingContext2D) {
     this.keyboard = new Keyboard();
     this.board = new Board(10, 20);
-    this.controls = new Controls(this.keyboard, this.board);
+    this.controls = new Controls(this.board);
+    this.keybinds = new Keybinds(this.keyboard, this.controls);
     this.renderer = new Renderer(this.board, ctx);
 
     this.tick = this.tick.bind(this);
@@ -23,7 +26,6 @@ class Game {
 
   private tick(elapsed: number): void {
     if (!this.frameRequestId) return;
-    this.frameRequestId = window.requestAnimationFrame(this.tick);
 
     const delta = Math.min((elapsed - this.previouslyElapsed) / 1000, 0.25);
     this.previouslyElapsed = elapsed;
@@ -31,6 +33,8 @@ class Game {
     this.controls.tick(delta);
     this.board.tick(delta);
     this.renderer.tick();
+
+    this.frameRequestId = window.requestAnimationFrame(this.tick);
   }
 
   public run() {

@@ -69,7 +69,8 @@ class Renderer {
       this.ctx.moveTo(offset, row * tileSize);
       this.ctx.lineTo(width - offset, row * tileSize);
       this.ctx.strokeStyle = this.borderColor;
-      this.ctx.lineWidth = 0.5;
+      this.ctx.fillStyle = 'white';
+      this.ctx.lineWidth = 1;
       this.ctx.stroke();
     }
 
@@ -78,16 +79,12 @@ class Renderer {
       this.ctx.moveTo(offset + col * tileSize, 0);
       this.ctx.lineTo(offset + col * tileSize, height);
       this.ctx.strokeStyle = this.borderColor;
-      this.ctx.lineWidth = 0.5;
+      this.ctx.fillStyle = 'white';
+      this.ctx.lineWidth = 1;
       this.ctx.stroke();
     }
 
-    for (const [row, time] of Object.entries(this.board.removed) as unknown as [
-      number,
-      number
-    ][]) {
-      if (!Number.isInteger(row)) return;
-      this.ctx.beginPath();
+    for (const [row, time] of this.board.removed) {
       this.ctx.fillStyle = 'white';
       this.ctx.globalAlpha =
         time < 0.5 ? 2 * time ** 2 : -1 + (4 - 2 * time) * time;

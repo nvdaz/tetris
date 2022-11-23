@@ -2,59 +2,47 @@ import { KeyCode } from 'keyboardevent-codes';
 import Board from './Board';
 import Keyboard from './Keyboard';
 
+export type Action =
+  | 'translateLeft'
+  | 'translateRight'
+  | 'descend'
+  | 'rotateClockwise'
+  | 'drop';
+
 const COOLDOWN = 0.1;
 
 class Controls {
-  private cooldown: Partial<Record<KeyCode, number>> = {};
-  public constructor(private keyboard: Keyboard, private board: Board) {
-    this.onKeyDown = this.onKeyDown.bind(this);
-    this.onKeyUp = this.onKeyUp.bind(this);
-    this.keyboard.registerOnKeyDown(this.onKeyDown);
-    this.keyboard.registerOnKeyUp(this.onKeyUp);
-  }
+  private cooldown: Partial<Record<Action, number>> = {};
+  public constructor(private board: Board) {}
 
-  private handle(key: KeyCode) {
-    if (key === 'KeyA') {
+  public handle(action: Action) {
+    if (action === 'translateLeft') {
       this.board.translate(-1);
-      this.cooldown[key] = 0.1;
-    }
-    if (key === 'KeyD') {
+      this.cooldown[action] = 0.1;
+    } else if (action === 'translateRight') {
       this.board.translate(1);
-      this.cooldown[key] = 0.1;
-    }
-    if (key === 'KeyS') {
+      this.cooldown[action] = 0.1;
+    } else if (action === 'descend') {
       this.board.descend();
-      this.cooldown[key] = 0.1;
-    }
-    if (key === 'KeyR') {
+      this.cooldown[action] = 0.1;
+    } else if (action === 'rotateClockwise') {
       this.board.rotate();
-      this.cooldown[key] = 0.25;
-    }
-    if (key === 'Space') {
+      this.cooldown[action] = 0.2;
+    } else if (action === 'drop') {
       this.board.drop();
-      this.cooldown[key] = 0.5;
+      this.cooldown[action] = 0.5;
     }
   }
 
-  private onKeyDown(key: KeyCode) {
-    if (key in this.cooldown) {
-      return;
-    }
-
-    this.handle(key);
-  }
-
-  private onKeyUp(key: KeyCode) {
-    if (key in this.cooldown) {
-      delete this.cooldown[key];
-    }
+  public endHandle(action: Action) {
+    delete this.cooldown[action];
   }
 
   public tick(delta: number) {
-    for (const key of Object.keys(this.cooldown) as ReadonlyArray<KeyCode>) {
-      this.cooldown[key]! -= delta;
-      if (this.cooldown[key]! <= 0) {
-        this.handle(key);
+    for (const action of Object.keys(this.cooldown) as ReadonlyArray<Action>) {
+      this.cooldown[action]! -= delta;
+      if (this.cooldown[action]! <= 0) {
+        this.handle(action);
       }
     }
   }

@@ -29,7 +29,7 @@ class Board {
   grid: Tile[][];
   piece!: Piece;
   next: number = 1;
-  removed: Record<number, number> = {};
+  removed: Map<number, number> = new Map();
 
   public constructor(readonly columns: number, readonly rows: number) {
     this.grid = [...Array(rows)].map((_) =>
@@ -87,7 +87,12 @@ class Board {
       ]);
     }
 
-    if (!newParts.every((p) => this.grid[p[1]][p[0]] === null)) return;
+    if (
+      !newParts.every(
+        (p) => p[1] >= 0 && p[1] < this.rows && this.grid[p[1]][p[0]] === null
+      )
+    )
+      return;
 
     this.piece.parts = newParts;
 
@@ -108,11 +113,12 @@ class Board {
         if (this.grid[i].every((t) => t !== null)) {
           this.grid.splice(i, 1);
           this.grid.unshift([...Array(this.columns)].map((_) => null));
-          this.removed[i] = 0.5;
+          this.removed.set(i, 0.5);
         }
       }
 
       this.newPiece();
+      this.next = 1;
     } else {
       for (const part of this.piece.parts) {
         part[1] += 1;
@@ -128,12 +134,14 @@ class Board {
   }
 
   public tick(delta: number) {
-    for (const key of Object.keys(this.removed) as unknown as number[]) {
-      this.removed[key] -= delta;
-      if (this.removed[key] <= 0) {
-        delete this.removed[key];
+    this.removed.forEach((time, key, removed) => {
+      const newTime = time - delta;
+      if (newTime <= 0) {
+        removed.delete(key);
+      } else {
+        removed.set(key, newTime);
       }
-    }
+    });
     this.next -= delta;
     if (this.next <= 0) {
       this.descend();
