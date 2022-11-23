@@ -1,13 +1,13 @@
-import { KeyCode } from 'keyboardevent-codes';
-import Board from './Board';
-import Keyboard from './Keyboard';
+import { KeyCode } from "keyboardevent-codes";
+import Board from "./Board";
+import Keyboard from "./Keyboard";
 
 export type Action =
-  | 'translateLeft'
-  | 'translateRight'
-  | 'descend'
-  | 'rotateClockwise'
-  | 'drop';
+  | "translateLeft"
+  | "translateRight"
+  | "descend"
+  | "rotateClockwise"
+  | "drop";
 
 const COOLDOWN = 0.1;
 
@@ -16,21 +16,22 @@ class Controls {
   public constructor(private board: Board) {}
 
   public handle(action: Action) {
-    if (action === 'translateLeft') {
+    const multiplier = action in this.cooldown ? 1 : 2;
+    if (action === "translateLeft") {
       this.board.translate(-1);
-      this.cooldown[action] = 0.1;
-    } else if (action === 'translateRight') {
+      this.cooldown[action] = 0.1 * multiplier;
+    } else if (action === "translateRight") {
       this.board.translate(1);
-      this.cooldown[action] = 0.1;
-    } else if (action === 'descend') {
+      this.cooldown[action] = 0.1 * multiplier;
+    } else if (action === "descend") {
       this.board.descend();
-      this.cooldown[action] = 0.1;
-    } else if (action === 'rotateClockwise') {
+      this.cooldown[action] = 0.1 * multiplier;
+    } else if (action === "rotateClockwise") {
       this.board.rotate();
-      this.cooldown[action] = 0.2;
-    } else if (action === 'drop') {
+      this.cooldown[action] = 0.2 * multiplier;
+    } else if (action === "drop") {
       this.board.drop();
-      this.cooldown[action] = 0.5;
+      this.cooldown[action] = 0.5 * multiplier;
     }
   }
 
