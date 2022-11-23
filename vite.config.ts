@@ -8,8 +8,13 @@ const version = pkg.version;
 const revision = execSync('git describe --long --always --dirty=-dirty')
   .toString()
   .trim();
+const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
 
-process.env.VERSION = `v${version}.${revision}`;
+console.log(branch);
+
+process.env.VERSION = `v${version}${
+  branch === 'main' ? '' : '-dev'
+}.${revision}`;
 
 export default defineConfig({
   plugins: [

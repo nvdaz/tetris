@@ -1,4 +1,4 @@
-import ArrayKeyedMap from '../JSONKeyedMap';
+import JSONKeyedMap from '../JSONKeyedMap';
 import pieces from '../pieces.json';
 import { assert } from './assert';
 
@@ -32,7 +32,16 @@ class Board {
   piece!: Piece;
   next: number = 1;
   removed: Map<number, number> = new Map();
-  locked: Map<[number, number], number> = new ArrayKeyedMap();
+  locked: JSONKeyedMap<
+    {
+      col: number;
+      row: number;
+      w: number;
+      h: number;
+      parts: [number, number][];
+    },
+    number
+  > = new JSONKeyedMap();
   shouldLock: number | false = false;
 
   public constructor(readonly columns: number, readonly rows: number) {
