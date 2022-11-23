@@ -1,4 +1,5 @@
 import clamp from '../clamp';
+import { easeInOutQuad } from '../easing';
 import Board from './Board';
 
 class Renderer {
@@ -86,8 +87,7 @@ class Renderer {
 
     for (const [row, time] of this.board.removed) {
       this.ctx.fillStyle = 'white';
-      this.ctx.globalAlpha =
-        time < 0.5 ? 2 * time ** 2 : -1 + (4 - 2 * time) * time;
+      this.ctx.globalAlpha = easeInOutQuad(time * 2);
       this.ctx.fillRect(
         offset,
         row * tileSize,
@@ -95,6 +95,32 @@ class Renderer {
         tileSize
       );
       this.ctx.globalAlpha = 1;
+    }
+
+    for (const [{ col, row, w, h, parts }, time] of this.board.locked) {
+      const gradientLength = 2;
+      const gradient = this.ctx.createLinearGradient(
+        0,
+        (row - h - gradientLength) * tileSize,
+        0,
+        row * tileSize
+      );
+
+      gradient.addColorStop(0, `rgba(255, 255, 255, 0)`);
+      gradient.addColorStop(
+        1,
+        `rgba(255, 255, 255, ${easeInOutQuad(time * 4) / 4})`
+      );
+      this.ctx.fillStyle = gradient;
+
+      for (const [c, r] of parts) {
+        this.ctx.fillRect(
+          offset + c * tileSize,
+          (row - gradientLength) * tileSize,
+          tileSize,
+          tileSize * (r - row + gradientLength + 1)
+        );
+      }
     }
 
     this.ctx.beginPath();

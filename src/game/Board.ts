@@ -1,3 +1,4 @@
+import ArrayKeyedMap from '../JSONKeyedMap';
 import pieces from '../pieces.json';
 import { assert } from './assert';
 
@@ -31,6 +32,8 @@ class Board {
   piece!: Piece;
   next: number = 1;
   removed: Map<number, number> = new Map();
+  locked: Map<[number, number], number> = new ArrayKeyedMap();
+  shouldLock: number | false = false;
 
   public constructor(readonly columns: number, readonly rows: number) {
     this.grid = [...Array(rows)].map((_) =>
@@ -146,19 +149,9 @@ class Board {
     );
 
     if (shouldStick) {
-      for (const part of this.piece.parts) {
-        this.grid[part[1]][part[0]] = this.piece.color;
+      if (this.shouldLock === false) {
+        this.shouldLock = 0.05;
       }
-
-      for (let i = 0; i < this.rows; i++) {
-        if (this.grid[i].every((t) => t !== null)) {
-          this.grid.splice(i, 1);
-          this.grid.unshift([...Array(this.columns)].map((_) => null));
-          this.removed.set(i, 0.5);
-        }
-      }
-
-      this.newPiece();
     } else {
       for (const part of this.piece.parts) {
         part[1] += 1;
@@ -169,24 +162,100 @@ class Board {
     return shouldStick;
   }
 
+  private lock() {
+    let left = this.piece.parts[0][0];
+    let right = this.piece.parts[0][0];
+    let top = this.piece.parts[0][1];
+    let bottom = this.piece.parts[0][1];
+    let parts: [number, number][] = [];
+    for (const part of this.piece.parts) {
+      this.grid[part[1]][part[0]] = this.piece.color;
+      if (part[0] < left) {
+        left = part[0];
+      }
+      if (part[0] > right) {
+        right = part[0];
+      }
+      if (part[1] < top) {
+        top = part[1];
+      }
+      if (part[1] > bottom) {
+        bottom = part[1];
+      }
+    }
+
+    const w = right - left + 1;
+    const h = bottom - top + 1;
+
+    console.log(bottom, top);
+    for (let row = bottom; row >= top; row--) {
+      if (parts.length === w) break;
+      for (const piece of this.piece.parts) {
+        console.log(piece, row);
+        if (piece[1] === row && !parts.some((p) => piece[0] === p[0])) {
+          parts.push(piece);
+        }
+      }
+    }
+
+    this.locked.set(
+      {
+        col: left,
+        row: top,
+        w,
+        h,
+        parts,
+      },
+      0.25
+    );
+    console.log(this.locked);
+    for (let i = 0; i < this.rows; i++) {
+      if (this.grid[i].every((t) => t !== null)) {
+        this.grid.splice(i, 1);
+        this.grid.unshift([...Array(this.columns)].map((_) => null));
+        this.removed.set(i, 0.5);
+      }
+    }
+
+    this.newPiece();
+  }
+
   public drop() {
     let shouldStick;
     while (!(shouldStick = this.descend())) {}
   }
 
   public tick(delta: number) {
-    this.removed.forEach((time, key, removed) => {
+    for (const [key, time] of this.removed) {
       const newTime = time - delta;
       if (newTime <= 0) {
-        removed.delete(key);
+        this.removed.delete(key);
       } else {
-        removed.set(key, newTime);
+        this.removed.set(key, newTime);
       }
-    });
+    }
+
+    for (const [part, time] of this.locked) {
+      const newTime = time - delta;
+      if (newTime <= 0) {
+        this.locked.delete(part);
+      } else {
+        this.locked.set(part, newTime);
+      }
+    }
+
     this.next -= delta;
     if (this.next <= 0) {
       this.descend();
       this.next = 1;
+    }
+    if (this.shouldLock !== false) {
+      this.shouldLock -= delta;
+
+      if (this.shouldLock <= 0) {
+        this.lock();
+        this.shouldLock = false;
+      }
     }
   }
 }

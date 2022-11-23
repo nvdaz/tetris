@@ -62,23 +62,23 @@
     "color": "orange",
     "rotatable": true,
     "parts": [
-      [0, 0],
-      [1, 0],
       [2, 0],
+      [0, 1],
+      [1, 1],
       [2, 1]
     ],
     "width": 3,
     "rotationsClockwise": [
-      [-1, 1],
-      [1, 1],
       [-2, 0],
-      [2, 0]
+      [2, 0],
+      [-1, 1],
+      [1, 1]
     ],
     "rotationsCounterClockwise": [
-      [-1, -1],
-      [-1, 1],
       [0, -2],
-      [0, 2]
+      [0, 2],
+      [-1, -1],
+      [-1, 1]
     ],
     "rotation": 0
   },
@@ -110,10 +110,10 @@
     "color": "limegreen",
     "rotatable": true,
     "parts": [
-      [0, 2],
-      [1, 2],
+      [0, 1],
       [1, 1],
-      [2, 1]
+      [1, 0],
+      [2, 0]
     ],
     "width": 3,
     "rotationsClockwise": [
