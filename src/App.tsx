@@ -29,6 +29,7 @@ function App() {
       </div>
       <div className={classNames.hud}>
         <h1>TETRIS</h1>
+        <h3>{import.meta.env.VERSION}</h3>
       </div>
     </div>
   );
