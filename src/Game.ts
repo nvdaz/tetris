@@ -14,9 +14,12 @@ class Game {
   private previouslyElapsed = 0;
   private frameRequestId?: number;
 
-  public constructor(ctx: CanvasRenderingContext2D) {
+  public constructor(
+    ctx: CanvasRenderingContext2D,
+    private onGameOver: () => void
+  ) {
     this.keyboard = new Keyboard();
-    this.board = new Board(10, 20);
+    this.board = new Board(10, 20, onGameOver);
     this.keybinds = new Keybinds(this.keyboard);
     this.controls = new Controls(this.board, this.keybinds);
     this.renderer = new Renderer(this.board, ctx);

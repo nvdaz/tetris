@@ -1,6 +1,6 @@
-import JSONKeyedMap from '../util/JSONKeyedMap';
-import pieces from '../pieces.json';
-import { assert } from '../util/assert';
+import JSONKeyedMap from './util/JSONKeyedMap';
+import pieces from './assets/pieces.json';
+import { assert } from './util/assert';
 
 export type Tile = string | null;
 
@@ -44,7 +44,11 @@ class Board {
   > = new JSONKeyedMap();
   shouldLock: number | false = false;
 
-  public constructor(readonly columns: number, readonly rows: number) {
+  public constructor(
+    readonly columns: number,
+    readonly rows: number,
+    private onGameOver: () => void
+  ) {
     this.grid = [...Array(rows)].map((_) =>
       [...Array(columns)].map((_) => null)
     );
@@ -58,6 +62,14 @@ class Board {
 
     for (const part of this.piece.parts) {
       part[0] += Math.floor((this.columns - this.piece.width) / 2);
+    }
+
+    if (
+      !this.piece.parts.every(
+        (p) => p[1] >= 0 && p[1] < this.rows && this.grid[p[1]][p[0]] === null
+      )
+    ) {
+      this.onGameOver();
     }
   }
 

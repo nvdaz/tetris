@@ -1,0 +1,25 @@
+.titleScreen {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title {
+  font-size: 10rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  line-height: 8rem;
+  margin: 0;
+}
+
+.version {
+  font-size: 0.875rem;
+}
+
+.play {
+  font-size: 8rem;
+  text-align: center;
+  cursor: pointer;
+}

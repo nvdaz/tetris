@@ -1,0 +1,25 @@
+.gameOverScreen {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title {
+  font-size: 8rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  line-height: 8rem;
+  margin: 0;
+}
+
+.game {
+  font-size: 0.875rem;
+}
+
+.play {
+  font-size: 6rem;
+  text-align: center;
+  cursor: pointer;
+}
