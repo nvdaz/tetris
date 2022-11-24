@@ -1,6 +1,6 @@
-import JSONKeyedMap from '../JSONKeyedMap';
+import JSONKeyedMap from '../util/JSONKeyedMap';
 import pieces from '../pieces.json';
-import { assert } from './assert';
+import { assert } from '../util/assert';
 
 export type Tile = string | null;
 

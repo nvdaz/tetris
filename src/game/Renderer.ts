@@ -1,5 +1,5 @@
-import clamp from '../clamp';
-import { easeInOutQuad } from '../easing';
+import clamp from '../util/clamp';
+import { easeInOutQuad } from '../util/easing';
 import Board from './Board';
 
 class Renderer {

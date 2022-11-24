@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { assert } from './assert';
+import { assert } from '../util/assert';
 import Game from './Game';
 
 type GameCanvasProps = {
