@@ -1,13 +1,13 @@
 import clamp from './util/clamp';
 import { easeInOutQuad } from './util/easing';
 import Board from './Board';
+import { assert } from './util/assert';
 
 class Renderer {
   private borderColor = 'black';
-  public constructor(
-    private board: Board,
-    private ctx: CanvasRenderingContext2D
-  ) {
+  private ctx?: CanvasRenderingContext2D;
+
+  public constructor(private board: Board) {
     this.onUpdateColorPreference = this.onUpdateColorPreference.bind(this);
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -27,6 +27,7 @@ class Renderer {
   }
 
   private draw() {
+    assert(this.ctx);
     const width = this.ctx.canvas.width;
     const height = this.ctx.canvas.height;
     const tileSize = Math.min(
@@ -132,6 +133,14 @@ class Renderer {
     this.ctx.strokeStyle = this.borderColor;
     this.ctx.lineWidth = border * 2;
     this.ctx.stroke();
+  }
+
+  public setRenderingContext(ctx: CanvasRenderingContext2D) {
+    this.ctx = ctx;
+  }
+
+  public hasRenderingContext(): boolean {
+    return !!this.ctx;
   }
 
   public tick() {

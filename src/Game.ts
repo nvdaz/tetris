@@ -14,15 +14,12 @@ class Game {
   private previouslyElapsed = 0;
   private frameRequestId?: number;
 
-  public constructor(
-    ctx: CanvasRenderingContext2D,
-    private onGameOver: () => void
-  ) {
+  public constructor() {
     this.keyboard = new Keyboard();
-    this.board = new Board(10, 20, onGameOver);
+    this.board = new Board(10, 20);
     this.keybinds = new Keybinds(this.keyboard);
     this.controls = new Controls(this.board, this.keybinds);
-    this.renderer = new Renderer(this.board, ctx);
+    this.renderer = new Renderer(this.board);
 
     this.tick = this.tick.bind(this);
   }
@@ -38,6 +35,19 @@ class Game {
     this.renderer.tick();
 
     this.frameRequestId = window.requestAnimationFrame(this.tick);
+  }
+
+  public setRenderingContext(ctx: CanvasRenderingContext2D) {
+    this.renderer.setRenderingContext(ctx);
+  }
+
+  public queueRun() {
+    if (!this.renderer.hasRenderingContext()) {
+      setTimeout(() => this.queueRun(), 50);
+      return;
+    }
+
+    this.run();
   }
 
   public run() {

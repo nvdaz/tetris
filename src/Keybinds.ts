@@ -11,13 +11,12 @@ class Keybinds {
     } else if (key === 'KeyD' || key === 'ArrowRight') {
       return 'translateRight';
     } else if (key === 'KeyS' || key === 'ArrowDown') {
-      return 'descend';
+      return 'dropSoft';
     } else if (key === 'KeyX' || key === 'ArrowUp') {
       return 'rotateClockwise';
     } else if (key === 'KeyZ') {
       return 'rotateCounterClockwise';
-    }
-    if (key === 'Space') {
+    } else if (key === 'Space') {
       return 'drop';
     }
   }

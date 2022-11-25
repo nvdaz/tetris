@@ -6,7 +6,7 @@ import Keyboard from './Keyboard';
 export type Action =
   | 'translateLeft'
   | 'translateRight'
-  | 'descend'
+  | 'dropSoft'
   | 'rotateClockwise'
   | 'rotateCounterClockwise'
   | 'drop';
@@ -26,8 +26,8 @@ class Controls {
     } else if (action === 'translateRight') {
       this.board.translate(1);
       cooldown = 0.1;
-    } else if (action === 'descend') {
-      this.board.descend();
+    } else if (action === 'dropSoft') {
+      this.board.dropSoft();
       cooldown = 0.1;
     } else if (action === 'rotateClockwise') {
       this.board.rotateClockwise();

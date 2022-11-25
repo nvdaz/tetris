@@ -1,6 +1,8 @@
 import JSONKeyedMap from './util/JSONKeyedMap';
+import store from './store';
 import pieces from './assets/pieces.json';
 import { assert } from './util/assert';
+import { increaseScore, resetScore, setGameStatus } from './store/gameSlice';
 
 export type Tile = string | null;
 
@@ -30,6 +32,7 @@ function isRotatable(piece: Piece): piece is RotatablePiece {
 class Board {
   grid: Tile[][];
   piece!: Piece;
+  level = 0;
   next: number = 1;
   removed: Map<number, number> = new Map();
   locked: JSONKeyedMap<
@@ -44,15 +47,12 @@ class Board {
   > = new JSONKeyedMap();
   shouldLock: number | false = false;
 
-  public constructor(
-    readonly columns: number,
-    readonly rows: number,
-    private onGameOver: () => void
-  ) {
+  public constructor(readonly columns: number, readonly rows: number) {
     this.grid = [...Array(rows)].map((_) =>
       [...Array(columns)].map((_) => null)
     );
     this.newPiece();
+    store.dispatch(resetScore());
   }
 
   private newPiece() {
@@ -69,7 +69,7 @@ class Board {
         (p) => p[1] >= 0 && p[1] < this.rows && this.grid[p[1]][p[0]] === null
       )
     ) {
-      this.onGameOver();
+      store.dispatch(setGameStatus('gameOver'));
     }
   }
 
@@ -208,11 +208,9 @@ class Board {
     const w = right - left + 1;
     const h = bottom - top + 1;
 
-    console.log(bottom, top);
     for (let row = bottom; row >= top; row--) {
       if (parts.length === w) break;
       for (const piece of this.piece.parts) {
-        console.log(piece, row);
         if (piece[1] === row && !parts.some((p) => piece[0] === p[0])) {
           parts.push(piece);
         }
@@ -229,21 +227,48 @@ class Board {
       },
       0.25
     );
-    console.log(this.locked);
+
+    let linesCleared = 0;
+
     for (let i = 0; i < this.rows; i++) {
       if (this.grid[i].every((t) => t !== null)) {
         this.grid.splice(i, 1);
         this.grid.unshift([...Array(this.columns)].map((_) => null));
         this.removed.set(i, 0.5);
+        linesCleared++;
       }
+    }
+
+    let score = 0;
+    if (linesCleared === 1) {
+      score = 100;
+    } else if (linesCleared === 2) {
+      score = 300;
+    } else if (linesCleared === 3) {
+      score = 500;
+    } else if (linesCleared === 4) {
+      score = 800;
+    }
+
+    if (score > 0) {
+      store.dispatch(increaseScore(score * (this.level + 1)));
     }
 
     this.newPiece();
   }
 
+  public dropSoft() {
+    this.descend();
+    store.dispatch(increaseScore(1));
+  }
+
   public drop() {
     let shouldStick;
-    while (!(shouldStick = this.descend())) {}
+    let count = 0;
+    while (!(shouldStick = this.descend())) {
+      count += 2;
+    }
+    store.dispatch(increaseScore(count));
   }
 
   public tick(delta: number) {

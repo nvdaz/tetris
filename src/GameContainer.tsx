@@ -1,21 +1,18 @@
 import React, { useCallback, useState } from 'react';
+import { useAppSelector } from './hooks';
 import GameOverScreen from './screens/GameOver';
 import PlayGameScreen from './screens/PlayGame';
 import TitleScreen from './screens/Title';
-
-type Page = 'title' | 'play' | 'gameOver';
+import { selectGameStatus } from './store/gameSlice';
 
 function GameContainer() {
-  const [page, setPage] = useState<Page>('title');
-
-  const onStart = useCallback(() => setPage('play'), []);
-  const onGameOver = useCallback(() => setPage('gameOver'), []);
+  const status = useAppSelector(selectGameStatus);
 
   return (
     <>
-      {page === 'title' && <TitleScreen onStart={onStart} />}
-      {page === 'play' && <PlayGameScreen onGameOver={onGameOver} />}
-      {page === 'gameOver' && <GameOverScreen onStart={onStart} />}
+      {status === 'title' && <TitleScreen />}
+      {status === 'play' && <PlayGameScreen />}
+      {status === 'gameOver' && <GameOverScreen />}
     </>
   );
 }

@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useAppDispatch } from '../hooks';
+import { setGameStatus } from '../store/gameSlice';
 import classNames from './Title.module.scss';
 
-type TitleScreenProps = {
-  onStart: () => void;
-};
+function TitleScreen() {
+  const dispatch = useAppDispatch();
 
-function TitleScreen({ onStart }: TitleScreenProps) {
+  const onStart = useCallback(() => dispatch(setGameStatus('play')),[dispatch]);
+
   return (
     <div className={classNames.titleScreen}>
       <h1 className={classNames.title}>TETRIS</h1>

@@ -10,17 +10,16 @@ import {
 import { assert } from '../util/assert';
 import Game from '../Game';
 import classNames from './PlayGame.module.scss';
+import { useAppSelector } from '../hooks';
+import { selectScore } from '../store/gameSlice';
 
-type PlayGameScreenProps = {
-  onGameOver: () => void;
-};
-
-function PlayGameScreen({ onGameOver }: PlayGameScreenProps) {
+function PlayGameScreen() {
   const [game, setGame] = useState<Game>();
   const gameContainer = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [width, setWidth] = useState<number>(300);
   const [height, setHeight] = useState<number>(150);
+  const score = useAppSelector(selectScore);
 
   const resizeGame = useCallback(() => {
     if (gameContainer.current) {
@@ -38,24 +37,20 @@ function PlayGameScreen({ onGameOver }: PlayGameScreenProps) {
   }, [gameContainer]);
 
   useEffect(() => {
-    if (canvas.current) {
-      setGame((game) => {
-        if (game) {
-          return game;
-        }
+    setGame(new Game());
+  }, []);
 
-        assert(canvas.current);
-        const context = canvas.current.getContext('2d');
-        assert(context);
-
-        return new Game(context, onGameOver);
-      });
+  useEffect(() => {
+    if (canvas.current && game) {
+      const ctx = canvas.current.getContext('2d');
+      assert(ctx);
+      game.setRenderingContext(ctx);
     }
-  }, [canvas.current]);
+  }, [canvas.current, game]);
 
   useEffect(() => {
     if (game) {
-      game.run();
+      game.queueRun();
       return () => game.stop();
     }
   }, [game]);
@@ -67,8 +62,10 @@ function PlayGameScreen({ onGameOver }: PlayGameScreenProps) {
       </div>
       <div className={classNames.hudContainer}>
         <div className={classNames.titleContainer}>
-          <h3 className={classNames.title}>TETRIS</h3>
-          <h4 className={classNames.version}>{import.meta.env.VERSION}</h4>
+          <h2 className={classNames.title}>TETRIS</h2>
+          <p className={classNames.version}>{import.meta.env.VERSION}</p>
+          <h3>Score</h3>
+          <p>{score}</p>
         </div>
       </div>
     </div>
