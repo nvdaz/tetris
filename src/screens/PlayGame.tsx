@@ -64,8 +64,8 @@ function PlayGameScreen() {
         <div className={classNames.titleContainer}>
           <h2 className={classNames.title}>TETRIS</h2>
           <p className={classNames.version}>{import.meta.env.VERSION}</p>
-          <h3>Score</h3>
-          <p>{score}</p>
+          <h3 className={classNames.scoreTitle}>Score</h3>
+          <p className={classNames.score}>{score}</p>
         </div>
       </div>
     </div>
