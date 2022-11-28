@@ -1,13 +1,25 @@
 import clamp from './util/clamp';
 import { easeInOutQuad } from './util/easing';
-import Board from './Board';
 import { assert } from './util/assert';
+import Grid from './Grid';
+import Board from './Board';
+import Player, {
+  isRowClearEvent,
+  isTetradLockEvent,
+  RowClearEvent,
+  TetradLockEvent,
+} from './Player';
+import Tetrad from './Tetrad';
+import { filter } from 'rxjs';
+import ofType from './util/ofType';
 
 class Renderer {
   private borderColor = 'black';
   private ctx?: CanvasRenderingContext2D;
+  private recentLocks = new Map<Tetrad, number>();
+  private recentClears = new Map<number, number>();
 
-  public constructor(private board: Board) {
+  public constructor(private grid: Grid, private player: Player) {
     this.onUpdateColorPreference = this.onUpdateColorPreference.bind(this);
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -16,6 +28,24 @@ class Renderer {
     }
 
     mediaQuery.onchange = this.onUpdateColorPreference;
+
+    this.onTetradLock = this.onTetradLock.bind(this);
+    player.eventEmitter$
+      .pipe(filter(isTetradLockEvent))
+      .subscribe(this.onTetradLock);
+
+    this.onRowClear = this.onRowClear.bind(this);
+    player.eventEmitter$
+      .pipe(filter(isRowClearEvent))
+      .subscribe(this.onRowClear);
+  }
+
+  private onTetradLock(event: TetradLockEvent) {
+    this.recentLocks.set(event.tetrad, 0.5);
+  }
+
+  private onRowClear(event: RowClearEvent) {
+    for (const row of event.rows) this.recentClears.set(row, 0.5);
   }
 
   private onUpdateColorPreference(event: MediaQueryListEvent) {
@@ -30,34 +60,27 @@ class Renderer {
     assert(this.ctx);
     const width = this.ctx.canvas.width;
     const height = this.ctx.canvas.height;
-    const tileSize = Math.min(
-      width / this.board.columns,
-      height / this.board.rows
-    );
+    const tileSize = Math.min(width / this.grid.cols, height / this.grid.rows);
 
     const offset = (width - tileSize * 10) / 2;
     const border = clamp(1, tileSize * 0.04, 4);
 
     this.ctx.clearRect(0, 0, width, height);
 
-    for (let col = 0; col < this.board.columns; col++) {
-      for (let row = 0; row < this.board.rows; row++) {
-        const tile = this.board.grid[row][col];
-        if (tile) {
-          this.ctx.fillStyle = tile;
-          this.ctx.fillRect(
-            offset + col * tileSize,
-            row * tileSize,
-            tileSize,
-            tileSize
-          );
-        }
+    for (const [row, col, color] of this.grid.tiles()) {
+      if (color !== null) {
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(
+          offset + col * tileSize,
+          row * tileSize,
+          tileSize,
+          tileSize
+        );
       }
     }
 
-    for (const [x, y] of this.board.piece.parts) {
-      this.ctx.fillStyle = this.board.piece.color;
-
+    for (const [x, y] of this.player.activePiece.tetrad.parts) {
+      this.ctx.fillStyle = this.player.activePiece.tetrad.color;
       this.ctx.fillRect(
         offset + x * tileSize,
         y * tileSize,
@@ -66,7 +89,7 @@ class Renderer {
       );
     }
 
-    for (let row = 0; row <= this.board.rows; row++) {
+    for (let row = 0; row <= this.grid.rows; row++) {
       this.ctx.beginPath();
       this.ctx.moveTo(offset, row * tileSize);
       this.ctx.lineTo(width - offset, row * tileSize);
@@ -76,7 +99,7 @@ class Renderer {
       this.ctx.stroke();
     }
 
-    for (let col = 0; col <= this.board.columns; col++) {
+    for (let col = 0; col <= this.grid.cols; col++) {
       this.ctx.beginPath();
       this.ctx.moveTo(offset + col * tileSize, 0);
       this.ctx.lineTo(offset + col * tileSize, height);
@@ -86,19 +109,35 @@ class Renderer {
       this.ctx.stroke();
     }
 
-    for (const [row, time] of this.board.removed) {
+    for (const [row, time] of this.recentClears) {
       this.ctx.fillStyle = 'white';
       this.ctx.globalAlpha = easeInOutQuad(time * 2);
       this.ctx.fillRect(
         offset,
         row * tileSize,
-        tileSize * this.board.columns,
+        tileSize * this.grid.cols,
         tileSize
       );
       this.ctx.globalAlpha = 1;
     }
 
-    for (const [{ col, row, w, h, parts }, time] of this.board.locked) {
+    for (const [tetrad, time] of this.recentLocks) {
+      const col = tetrad.left;
+      const row = tetrad.top;
+      const w = tetrad.width;
+      const h = tetrad.height;
+
+      const bottomParts: [number, number][] = [];
+
+      for (let r = row + h - 1; r >= row; r--) {
+        if (bottomParts.length === w) break;
+        for (const piece of tetrad.parts) {
+          if (piece[1] === r && !bottomParts.some((p) => piece[0] === p[0])) {
+            bottomParts.push(piece);
+          }
+        }
+      }
+
       const gradientLength = 2;
       const gradient = this.ctx.createLinearGradient(
         0,
@@ -114,7 +153,7 @@ class Renderer {
       );
       this.ctx.fillStyle = gradient;
 
-      for (const [c, r] of parts) {
+      for (const [c, r] of bottomParts) {
         this.ctx.fillRect(
           offset + c * tileSize,
           (row - gradientLength) * tileSize,
@@ -122,6 +161,8 @@ class Renderer {
           tileSize * (r - row + gradientLength + 1)
         );
       }
+
+      this.ctx.fillStyle = 'black';
     }
 
     this.ctx.beginPath();
@@ -143,8 +184,24 @@ class Renderer {
     return !!this.ctx;
   }
 
-  public tick() {
+  public tick(delta: number) {
     this.draw();
+
+    for (const [tetrad, time] of this.recentLocks) {
+      if (time <= 0) {
+        this.recentLocks.delete(tetrad);
+      } else {
+        this.recentLocks.set(tetrad, time - delta);
+      }
+    }
+
+    for (const [row, time] of this.recentClears) {
+      if (time <= 0) {
+        this.recentClears.delete(row);
+      } else {
+        this.recentClears.set(row, time - delta);
+      }
+    }
   }
 }
 

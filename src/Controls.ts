@@ -1,7 +1,13 @@
 import { KeyCode } from 'keyboardevent-codes';
 import Board from './Board';
+import DropHardCommand from './commands/DropHardCommand';
+import DropSoftCommand from './commands/DropSoftCommand';
+import MoveCommand from './commands/MoveCommand';
+import RotateClockwiseCommand from './commands/RotateClockwiseCommand';
+import RotateCounterClockwiseCommand from './commands/RotateCounterClockwiseCommand';
 import Keybinds from './Keybinds';
 import Keyboard from './Keyboard';
+import Player from './Player';
 
 export type Action =
   | 'translateLeft'
@@ -15,28 +21,32 @@ const COOLDOWN = 0.1;
 
 class Controls {
   private cooldowns: Map<Action, number> = new Map();
-  public constructor(private board: Board, private keybinds: Keybinds) {}
+  public constructor(
+    private player: Player,
+    private board: Board,
+    private keybinds: Keybinds
+  ) {}
 
   public handle(action: Action) {
     let cooldown = 0;
     const multiplier = this.cooldowns.has(action) ? 1 : 2;
     if (action === 'translateLeft') {
-      this.board.translate(-1);
+      new MoveCommand(this.player, this.board).execute(-1);
       cooldown = 0.1;
     } else if (action === 'translateRight') {
-      this.board.translate(1);
+      new MoveCommand(this.player, this.board).execute(1);
       cooldown = 0.1;
     } else if (action === 'dropSoft') {
-      this.board.dropSoft();
+      new DropSoftCommand(this.player, this.board).execute();
       cooldown = 0.1;
     } else if (action === 'rotateClockwise') {
-      this.board.rotateClockwise();
+      new RotateClockwiseCommand(this.player, this.board).execute();
       cooldown = 0.2;
     } else if (action === 'rotateCounterClockwise') {
-      this.board.rotateCounterClockwise();
+      new RotateCounterClockwiseCommand(this.player, this.board).execute();
       cooldown = 0.2;
     } else if (action === 'drop') {
-      this.board.drop();
+      new DropHardCommand(this.player, this.board).execute();
       cooldown = 0.5;
     }
 

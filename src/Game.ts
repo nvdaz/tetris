@@ -1,12 +1,16 @@
 import Board from './Board';
 import Controls from './Controls';
+import Grid from './Grid';
 import Keybinds from './Keybinds';
 import Keyboard from './Keyboard';
+import Player from './Player';
 import Renderer from './Renderer';
+import StandardGameMode from './StandardGameMode';
 
 class Game {
   private keyboard: Keyboard;
-  private board: Board;
+  private player: Player;
+  private gameMode: StandardGameMode;
   private controls: Controls;
   private keybinds: Keybinds;
   private renderer: Renderer;
@@ -16,10 +20,15 @@ class Game {
 
   public constructor() {
     this.keyboard = new Keyboard();
-    this.board = new Board(10, 20);
+    this.gameMode = new StandardGameMode();
+    this.player = new Player(this.gameMode.board);
     this.keybinds = new Keybinds(this.keyboard);
-    this.controls = new Controls(this.board, this.keybinds);
-    this.renderer = new Renderer(this.board);
+    this.controls = new Controls(
+      this.player,
+      this.gameMode.board,
+      this.keybinds
+    );
+    this.renderer = new Renderer(this.gameMode.grid, this.player);
 
     this.tick = this.tick.bind(this);
   }
@@ -31,8 +40,8 @@ class Game {
     this.previouslyElapsed = elapsed;
 
     this.controls.tick(delta);
-    this.board.tick(delta);
-    this.renderer.tick();
+    this.player.tick(delta);
+    this.renderer.tick(delta);
 
     this.frameRequestId = window.requestAnimationFrame(this.tick);
   }
