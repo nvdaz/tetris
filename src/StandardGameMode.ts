@@ -1,8 +1,7 @@
-import Behavior from './behaviors/Behavior';
 import Board from './Board';
 import Grid from './Grid';
 
-class StandardGameMode implements GameMode {
+class StandardGameMode {
   readonly grid: Grid;
   readonly board: Board;
 

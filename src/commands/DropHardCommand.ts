@@ -1,10 +1,11 @@
 import Board from '../Board';
 import Player from '../Player';
+import Command from './Command';
 
 class DropHardCommand implements Command {
   public constructor(readonly player: Player, readonly board: Board) {}
 
-  public execute(dx: number): void {
+  public execute(): void {
     let count = 0;
     while (!this.player.descend()) {
       count++;

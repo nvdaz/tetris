@@ -11,7 +11,6 @@ import Player, {
 } from './Player';
 import Tetrad from './Tetrad';
 import { filter } from 'rxjs';
-import ofType from './util/ofType';
 
 class Renderer {
   private borderColor = 'black';

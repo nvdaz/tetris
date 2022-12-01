@@ -1,7 +1,8 @@
-import Grid from '../Grid';
-import Player from '../Player';
+import Board from "../Board";
+import Player from "../Player";
 
 interface Command {
-  constructor(player: Player, grid: Grid);
   execute(): void;
 }
+
+export default Command;

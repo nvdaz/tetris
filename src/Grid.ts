@@ -4,7 +4,7 @@ export type Tile = string | null;
 export type Coordinate = [number, number];
 export type DefiniteCoordinate = [...Coordinate, Tile];
 
-class Grid implements IGrid<Event> {
+class Grid {
   private readonly _tiles: Tile[][];
 
   public constructor(
@@ -34,10 +34,6 @@ class Grid implements IGrid<Event> {
   public removeRow(row: number): void {
     this._tiles.splice(row, 1);
     this._tiles.unshift([...Array(this.cols)].map(() => null));
-  }
-
-  public get eventEmitter$(): Observable<Event> {
-    return this.eventEmitter.asObservable();
   }
 
   public isWithinBounds(coord: Coordinate): boolean {

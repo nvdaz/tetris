@@ -1,4 +1,4 @@
-import pieces from './assets/pieces.json';
+import pieces from "./assets/pieces.json";
 
 class Tetrad {
   public static random(): Tetrad {
@@ -63,7 +63,7 @@ class Tetrad {
   }
 
   public getTranslation(): [number, number] {
-    const translation = [this.parts[0][0], this.parts[0][1]];
+    const translation: [number, number] = [this.parts[0][0], this.parts[0][1]];
 
     for (const part of this.parts) {
       if (part[0] < translation[0]) translation[0] = part[0];
@@ -74,7 +74,7 @@ class Tetrad {
   }
 
   public clone() {
-    return new Tetrad(structuredClone(this.parts), this.color, this.rotatable);
+    return new Tetrad(structuredClone(this.parts), this.color);
   }
 }
 

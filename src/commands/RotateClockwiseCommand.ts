@@ -1,10 +1,11 @@
 import Board from '../Board';
 import Player from '../Player';
+import Command from './Command';
 
 class RotateClockwiseCommand implements Command {
   public constructor(readonly player: Player, readonly board: Board) {}
 
-  public execute(dx: number): void {
+  public execute(): void {
     const tetrad = this.player.activePiece.tetrad;
     const rotation = this.player.activePiece.rotation;
     if (!tetrad.isRotatable()) {

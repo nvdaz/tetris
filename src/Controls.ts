@@ -1,4 +1,3 @@
-import { KeyCode } from 'keyboardevent-codes';
 import Board from './Board';
 import DropHardCommand from './commands/DropHardCommand';
 import DropSoftCommand from './commands/DropSoftCommand';

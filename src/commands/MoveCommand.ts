@@ -1,5 +1,6 @@
 import Board from '../Board';
 import Player from '../Player';
+import Command from './Command';
 
 class MoveCommand implements Command {
   public constructor(readonly player: Player, readonly board: Board) {}
